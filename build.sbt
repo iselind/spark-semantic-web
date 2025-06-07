@@ -5,12 +5,17 @@ lazy val commonSettings = Seq(
   scalaVersion := scalaVer,
   organization := "com.yourorg",
   libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
-  version := "0.1.0-SNAPSHOT"
+  version := "0.1.0-SNAPSHOT",
+)
+
+lazy val formatOnCompileSettings = Seq(
+  Test / compile := (Test / compile).dependsOn(Compile / scalafmt, Test / scalafmt).value
 )
 
 lazy val library = (project in file("library"))
   .settings(
     commonSettings,
+    formatOnCompileSettings,
     name := "your-library",
     libraryDependencies ++= Seq(
       "org.apache.spark" %% "spark-core" % sparkVersion,
@@ -23,17 +28,18 @@ lazy val app = (project in file("app"))
   .dependsOn(library)
   .settings(
     commonSettings,
+    formatOnCompileSettings,
     name := "your-app",
-
-    // To get Spark to work in Java 11+
-    run / fork := true,
-    run / javaOptions += "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
   )
 
 lazy val root = (project in file("."))
-  .aggregate(library, app)
+  .aggregate(app)
   .settings(
     commonSettings,
-    name := "your-project",
+    name := "spark-semantic-web",
     publish / skip := true
   )
+
+enablePlugins(ScalafmtPlugin)
+addCommandAlias("format", "scalafmtAll")
+addCommandAlias("checkFormat", "scalafmtCheckAll")
