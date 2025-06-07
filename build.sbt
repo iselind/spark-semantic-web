@@ -23,7 +23,11 @@ lazy val app = (project in file("app"))
   .dependsOn(library)
   .settings(
     commonSettings,
-    name := "your-app"
+    name := "your-app",
+
+    // To get Spark to work in Java 11+
+    run / fork := true,
+    run / javaOptions += "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"
   )
 
 lazy val root = (project in file("."))
@@ -33,4 +37,3 @@ lazy val root = (project in file("."))
     name := "your-project",
     publish / skip := true
   )
-
