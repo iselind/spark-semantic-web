@@ -1,18 +1,17 @@
-import org.apache.spark.{SparkConf, SparkContext}
-import SparkContextSparqlExtension._ // Import the implicit class
+import org.apache.spark.sql.SparkSession
+import SparkSessionSparqlExtension._
 
 object Main {
   def main(args: Array[String]): Unit = {
-    val conf = new SparkConf().setAppName("SparqlExample").setMaster("local[*]")
-    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder()
+      .appName("SparqlExample")
+      .master("local[*]")
+      .getOrCreate()
 
-    // Now you can use the new `sparql` method
-    sc.sparql("""
+    spark.sparql("""
       PREFIX foaf: <http://xmlns.com/foaf/0.1/>
       SELECT ?name WHERE { ?person foaf:name ?name }
     """)
-
-    sc.stop()
   }
 }
 

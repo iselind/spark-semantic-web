@@ -1,18 +1,13 @@
-import org.apache.spark.SparkContext
+import org.apache.spark.sql.SparkSession
 
-// This class adds a `sparql` method to SparkContext via implicit class
-object SparkContextSparqlExtension {
+// Adds a `sparql` method to SparkSession
+object SparkSessionSparqlExtension {
 
-  // Define an implicit class to add the `sparql` method
-  implicit class SparqlEnhancedContext(sc: SparkContext) {
+  implicit class SparqlEnhancedSession(spark: SparkSession) {
 
-    // The new method `sparql` you want to add
     def sparql(query: String): Unit = {
       // Dummy implementation — replace with actual SPARQL logic
       println(s"Running SPARQL query: $query")
-
-      // Example: You could integrate with a triplestore, RDF library, or parse files here
-      // e.g., call out to Apache Jena, RDF4J, etc.
     }
   }
 }
