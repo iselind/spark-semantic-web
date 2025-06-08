@@ -27,7 +27,7 @@ class SparqlQuerySuite extends FunSuite {
     val actualNames: List[String] = sparkSession
       .sparql(query, rdfFiles)
       .select(
-        "value" // XXX: The column will have the name "value", and not "name" which should be expected based on the query
+        "name"
       )
       .as[String]
       .collect()

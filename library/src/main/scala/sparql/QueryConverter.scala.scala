@@ -1,16 +1,16 @@
 package sparkql
 
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.{Dataset, DataFrame, SparkSession}
 
 object QueryConverter {
   def toSpark(query: String, rdfFiles: Set[String])(implicit
       spark: SparkSession
-  ): Dataset[String] = {
+  ): DataFrame = {
     import spark.implicits._
 
     // TODO: Translate query to Spark logic
     println("Query not supported by Spark")
 
-    Seq.empty[String].toDS()
+    Seq.empty[String].toDF()
   }
 }
