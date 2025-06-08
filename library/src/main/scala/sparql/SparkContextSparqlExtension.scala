@@ -1,12 +1,12 @@
 package sparkql
 
-import org.apache.spark.sql.SparkSession
-import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.query.QueryExecutionFactory
+import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.RDFDataMgr
 import org.apache.spark.sql.Dataset
-import sparkql.QueryConverter.toSpark
+import org.apache.spark.sql.SparkSession
 import sparkql.FallbackHandler.fallback
+import sparkql.QueryConverter.toSpark
 
 // Adds a `sparql` method to SparkSession
 object SparkSessionSparqlExtension {
@@ -23,12 +23,12 @@ object SparkSessionSparqlExtension {
         fallback(query, rdfFiles)(spark)
       }
     }
+  }
 
-    def supportsQuery(query: String): Boolean = {
-      println("Query not supported by Spark")
+  def supportsQuery(query: String): Boolean = {
+    println("Query not supported by Spark")
 
-      // Stub for now: eventually inspect the query structure
-      false
-    }
+    // Stub for now: eventually inspect the query structure
+    false
   }
 }

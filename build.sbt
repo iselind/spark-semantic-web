@@ -33,7 +33,7 @@ lazy val app = (project in file("app"))
   )
 
 lazy val root = (project in file("."))
-  .aggregate(app)
+  .aggregate(library, app)
   .settings(
     commonSettings,
     name := "spark-semantic-web",
