@@ -1,5 +1,5 @@
 import org.apache.spark.sql.SparkSession
-import SparkSessionSparqlExtension._
+import sparkql.SparkSessionSparqlExtension._
 
 object Main {
   def main(args: Array[String]): Unit = {
