@@ -1,4 +1,4 @@
-val scalaVer = "2.12.18"
+val scalaVer = "2.12.15"
 val sparkVersion = "3.5.1"
 
 lazy val commonSettings = Seq(
