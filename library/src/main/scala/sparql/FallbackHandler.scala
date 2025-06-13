@@ -1,23 +1,29 @@
-package sparkql
+package sparql
 
-import org.apache.jena.rdf.model.ModelFactory
-import org.apache.jena.query.QueryExecutionFactory
+import org.apache.jena.query.{QueryExecutionFactory, QueryFactory}
+import org.apache.jena.rdf.model.{Model, ModelFactory}
 import org.apache.jena.riot.RDFDataMgr
-import org.apache.spark.sql.{Dataset, DataFrame, SparkSession}
-import org.apache.jena.query.QueryFactory
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.graphframes.GraphFrame
+
 import scala.collection.JavaConverters._
-import org.apache.spark.sql.Encoder
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.types.StructField
-import org.apache.spark.sql.types.StringType
 
 object FallbackHandler {
+
+  def fallback(query: String, graph: GraphFrame)(implicit spark: SparkSession): DataFrame = {
+    val model = JenaFrame.toJenaModel(graph)
+    model match {
+      case Some(model: Model) =>
+        fallback(query, model)
+      case None =>
+        throw NoSuchModel()
+    }
+  }
+
   def fallback(query: String, rdfFiles: Set[String])(implicit
       spark: SparkSession
   ): DataFrame = {
-    println("Using fallback")
-
     val model = ModelFactory.createDefaultModel()
 
     rdfFiles.foreach { filePath =>
@@ -25,6 +31,10 @@ object FallbackHandler {
       RDFDataMgr.read(model, filePath)
     }
 
+    fallback(query, model)
+  }
+
+  def fallback(query: String, model: Model)(implicit spark: SparkSession): DataFrame = {
     val parsedQuery = QueryFactory.create(query)
     val resultVars = parsedQuery.getResultVars.asScala.toSeq
 

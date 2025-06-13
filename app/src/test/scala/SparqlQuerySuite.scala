@@ -1,6 +1,8 @@
 import munit.FunSuite
 import org.apache.spark.sql.SparkSession
-import sparkql.SparkSessionSparqlExtension._
+import sparql.JenaFrame
+import sparql.SparkSessionSparqlExtension._
+import sparql.executionstrategy.JenaOnlyStrategy
 
 class SparqlQuerySuite extends FunSuite {
 
@@ -10,25 +12,26 @@ class SparqlQuerySuite extends FunSuite {
     .master("local[*]")
     .getOrCreate()
 
+  import sparkSession.implicits._
+
   override def afterAll(): Unit = {
     sparkSession.stop()
   }
 
-  test("SPARQL query returns expected names") {
+  test("SPARQL query executed by Jena returns expected names") {
     val rdfFiles = Set("data/example1.ttl", "data/example2.rdf")
+    val frame = JenaFrame.toGraphFrame(rdfFiles)(sparkSession)
+    sparkSession.registerGraph(frame, "Jena")
+
     val query =
       """
         PREFIX foaf: <http://xmlns.com/foaf/0.1/>
         SELECT ?name WHERE { ?person foaf:name ?name }
       """
 
-    import sparkSession.implicits._
-
     val actualNames: List[String] = sparkSession
-      .sparql(query, rdfFiles)
-      .select(
-        "name"
-      )
+      .sparql(query, JenaOnlyStrategy)
+      .select("name")
       .as[String]
       .collect()
       .toList
