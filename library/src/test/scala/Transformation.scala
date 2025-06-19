@@ -1,5 +1,6 @@
-import org.apache.jena.graph.Node
+import org.apache.jena.graph.{Node, NodeFactory, Triple}
 import org.apache.jena.query.QueryFactory
+import sparql.BgpToGraphFrame.buildMotifAndFilter
 import sparql.SparqlParser.parseElement
 
 /*
@@ -15,8 +16,9 @@ import sparql.SparqlParser.parseElement
  * )
  */
 
-// For more information on writing tests, see
-// https://scalameta.org/munit/docs/getting-started.html
+/**
+ * Tests the conversion from sparql to QueryNode
+ */
 class Transformation extends munit.FunSuite {
   test("Single BGP test") {
     // This query means:
@@ -58,21 +60,21 @@ class Transformation extends munit.FunSuite {
     assertListSize(parsed.bgp, 1)
 
     val myBgp = parsed.bgp.head.asTriple()
-    val subject = myBgp.getMatchSubject()
-    val pred = myBgp.getMatchPredicate()
-    val o = myBgp.getMatchObject()
+    val subject = myBgp.getMatchSubject
+    val predicate = myBgp.getMatchPredicate
+    val o = myBgp.getMatchObject
 
     println(myBgp)
     printNode(subject)
-    printNode(pred)
+    printNode(predicate)
     printNode(o)
 
-    assert(subject.isVariable())
-    assertEquals(subject.getName(), "s", subject)
-    assert(pred.isURI())
-    assertEquals(pred.getURI(), "http://xmlns.com/foaf/0.1/name", subject)
-    assert(o.isVariable())
-    assertEquals(o.getName(), "name", subject)
+    assert(subject.isVariable)
+    assertEquals(subject.getName, "s", subject)
+    assert(predicate.isURI)
+    assertEquals(predicate.getURI, "http://xmlns.com/foaf/0.1/name", subject)
+    assert(o.isVariable)
+    assertEquals(o.getName, "name", subject)
   }
 
   def printNode(node: Node): Unit = {
@@ -174,5 +176,18 @@ class Transformation extends munit.FunSuite {
     val parsed = parseElement(queryPattern)
     assert(parsed != null)
     // printQueryNode(parsed)
+  }
+
+  test("BGP to motif and filter") {
+    val triples = Seq(
+      Triple.create(NodeFactory.createVariable("s"), NodeFactory.createURI("http://xmlns.com/foaf/0.1/name"), NodeFactory.createVariable("name")),
+      Triple.create(NodeFactory.createVariable("s"), NodeFactory.createURI("http://xmlns.com/foaf/0.1/age"), NodeFactory.createLiteral("25"))
+    )
+
+    val result = buildMotifAndFilter(triples)
+
+    assertEquals(result.motif, "(v1)-[e0]->(v2) ; (v1)-[e1]->(lit3)")
+    assertEquals(result.filter, "e0.relationship = 'http://xmlns.com/foaf/0.1/name' AND e1.relationship = 'http://xmlns.com/foaf/0.1/age' AND lit3.value = '25'")
+
   }
 }
