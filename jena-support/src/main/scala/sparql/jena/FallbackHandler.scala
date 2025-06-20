@@ -12,7 +12,9 @@ import scala.collection.JavaConverters._
 
 object FallbackHandler {
 
-  def fallback(query: String, graph: GraphFrame)(implicit spark: SparkSession): DataFrame = {
+  def fallback(query: String, graph: GraphFrame)(implicit
+      spark: SparkSession
+  ): DataFrame = {
     val model = JenaFrame.toJenaModel(graph)
     model match {
       case Some(model: Model) =>
@@ -35,7 +37,9 @@ object FallbackHandler {
     fallback(query, model)
   }
 
-  def fallback(query: String, model: Model)(implicit spark: SparkSession): DataFrame = {
+  def fallback(query: String, model: Model)(implicit
+      spark: SparkSession
+  ): DataFrame = {
     val parsedQuery = QueryFactory.create(query)
     val resultVars = parsedQuery.getResultVars.asScala.toSeq
 

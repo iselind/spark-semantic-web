@@ -1,6 +1,7 @@
 import munit.FunSuite
 import org.apache.spark.sql.SparkSession
 import sparql.core.SparkSessionSparqlExtension._
+import sparql.core.SparqlExecutionStrategy
 import sparql.jena.JenaFrame
 import sparql.jena.executionstrategy.JenaOnlyStrategy
 
@@ -29,8 +30,9 @@ class SparqlQuerySuite extends FunSuite {
         SELECT ?name WHERE { ?person foaf:name ?name }
       """
 
+    val strategy: SparqlExecutionStrategy = JenaOnlyStrategy
     val actualNames: List[String] = sparkSession
-      .sparql(query, JenaOnlyStrategy)
+      .sparql(query)(strategy)
       .select("name")
       .as[String]
       .collect()

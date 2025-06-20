@@ -23,7 +23,9 @@ object SparkSessionSparqlExtension {
     def graphStore: GraphStore =
       sessionToStore.getOrElseUpdate(spark, new MapGraphStore())
 
-    def sparql(query: String)(implicit execStrategy: SparqlExecutionStrategy): DataFrame = {
+    def sparql(
+        query: String
+    )(implicit execStrategy: SparqlExecutionStrategy): DataFrame = {
       execStrategy.execute(query)(spark)
     }
 

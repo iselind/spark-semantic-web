@@ -5,7 +5,9 @@ trait Triple {
   def getPredicate: Node
   def getObject: Node
 
-  def getMathSubject: Node
-  def getMathPredicate: Node
-  def getMathObject: Node
+  def getMatchSubject: Node
+
+  def getMatchPredicate: Node
+
+  def getMatchObject: Node
 }

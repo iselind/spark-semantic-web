@@ -1,11 +1,11 @@
 package sparql.jena
 
 import sparql.core.BgpToGraphFrame.buildMotifAndFilter
-import sparql.core.ext.{Node, SparqlParser}
+import sparql.core.ext
+import sparql.core.ext.SparqlParser
 
-/**
- * Tests the conversion from sparql to QueryNode
- */
+/** Tests the conversion from sparql to QueryNode
+  */
 class Transformation extends munit.FunSuite {
   test("Single BGP test") {
     // This query means:
@@ -62,20 +62,20 @@ class Transformation extends munit.FunSuite {
     assertEquals(o.getName, "name", subject)
   }
 
-  def printNode(node: Node): Unit = {
+  def printNode(node: ext.Node): Unit = {
     println(nodeToString(node))
   }
 
-  def nodeToString(node: Node): String = {
+  def nodeToString(node: ext.Node): String = {
     /*
      * A Node has subtypes:
      * Node_Blank, Node_URI, Node_Literal, Node_Triple for RDF terms.
      * Node_Variable, Node_ANY, for variables and wildcard.
      * ARQs Var extends Node_Variable.
-     * Node_Ext(ension), and Node_Graph outside RDF.
+     * Node_Ext(extension), and Node_Graph outside RDF.
      */
 
-    if (node == Node.ANY) {
+    if (node == sparql.jena.Node.ANY) {
       "Any node (wildcard)"
     } else if (node.isVariable) {
       s"Variable node: ${node.getName}"
@@ -161,14 +161,25 @@ class Transformation extends munit.FunSuite {
 
   test("BGP to motif and filter") {
     val triples = Seq(
-      Triple.create(NodeFactory.createVariable("s"), NodeFactory.createURI("http://xmlns.com/foaf/0.1/name"), NodeFactory.createVariable("name")),
-      Triple.create(NodeFactory.createVariable("s"), NodeFactory.createURI("http://xmlns.com/foaf/0.1/age"), NodeFactory.createLiteral("25"))
+      Triple.create(
+        NodeFactory.createVariable("s"),
+        NodeFactory.createURI("http://xmlns.com/foaf/0.1/name"),
+        NodeFactory.createVariable("name")
+      ),
+      Triple.create(
+        NodeFactory.createVariable("s"),
+        NodeFactory.createURI("http://xmlns.com/foaf/0.1/age"),
+        NodeFactory.createLiteral("25")
+      )
     )
 
     val result = buildMotifAndFilter(triples)
 
     assertEquals(result.motif, "(v1)-[e0]->(v2) ; (v1)-[e1]->(lit3)")
-    assertEquals(result.filter, "e0.relationship = 'http://xmlns.com/foaf/0.1/name' AND e1.relationship = 'http://xmlns.com/foaf/0.1/age' AND lit3.value = '25'")
+    assertEquals(
+      result.filter,
+      "e0.relationship = 'http://xmlns.com/foaf/0.1/name' AND e1.relationship = 'http://xmlns.com/foaf/0.1/age' AND lit3.value = '25'"
+    )
 
   }
 }

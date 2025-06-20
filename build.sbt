@@ -15,6 +15,17 @@ lazy val formatOnCompileSettings = Seq(
 )
 
 
+lazy val jenaSupport = (project in file("jena-support"))
+  .dependsOn(library)
+  .settings(
+    commonSettings,
+    formatOnCompileSettings,
+    name := "jena-support",
+    libraryDependencies ++= Seq(
+      "org.apache.jena" % "apache-jena-libs" % "4.10.0" pomOnly(),
+    )
+  )
+
 lazy val library = (project in file("library"))
   .settings(
     commonSettings,
@@ -31,7 +42,7 @@ lazy val library = (project in file("library"))
   )
 
 lazy val app = (project in file("app"))
-  .dependsOn(library)
+  .dependsOn(jenaSupport)
   .settings(
     commonSettings,
     formatOnCompileSettings,
@@ -39,7 +50,7 @@ lazy val app = (project in file("app"))
   )
 
 lazy val root = (project in file("."))
-  .aggregate(library, app)
+  .aggregate(library, app, jenaSupport)
   .settings(
     commonSettings,
     name := "spark-semantic-web",
