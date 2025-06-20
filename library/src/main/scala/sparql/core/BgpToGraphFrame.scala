@@ -1,6 +1,6 @@
 package sparql.core
 
-import org.apache.jena.graph.{Node, Triple}
+import sparql.core.ext.{Node, Triple}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer

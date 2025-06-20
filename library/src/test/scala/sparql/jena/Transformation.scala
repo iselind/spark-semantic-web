@@ -1,20 +1,7 @@
-import org.apache.jena.graph.{Node, NodeFactory, Triple}
-import org.apache.jena.query.QueryFactory
-import sparql.core.BgpToGraphFrame.buildMotifAndFilter
-import sparql.core.SparqlParser.parseElement
+package sparql.jena
 
-/*
- * case class QueryNode(
- *     bgp: List[TriplePath] = List(),
- *     filters: List[Expr] = List(),
- *     unions: List[List[QueryNode]] = List(),
- *     optionals: List[QueryNode] = List(),
- *     others: List[String] = List(),
- *     aborted: Boolean = false,
- *     abortReason: Option[String] = None,
- *     requiresFallback: Boolean = false
- * )
- */
+import sparql.core.BgpToGraphFrame.buildMotifAndFilter
+import sparql.core.ext.{Node, SparqlParser}
 
 /**
  * Tests the conversion from sparql to QueryNode
@@ -44,10 +31,8 @@ class Transformation extends munit.FunSuite {
         |}
         |""".stripMargin
 
-    val query = QueryFactory.create(sparql)
-    val queryPattern = query.getQueryPattern
-
-    val parsed = parseElement(queryPattern)
+    val parser: SparqlParser = JenaSparqlParser
+    val parsed = parser.parse(sparql)
     assert(parsed != null)
 
     // Make sure we only discovered one BGP
@@ -59,7 +44,7 @@ class Transformation extends munit.FunSuite {
     assertListSize(parsed.others, 0)
     assertListSize(parsed.bgp, 1)
 
-    val myBgp = parsed.bgp.head.asTriple()
+    val myBgp = parsed.bgp.head
     val subject = myBgp.getMatchSubject
     val predicate = myBgp.getMatchPredicate
     val o = myBgp.getMatchObject
@@ -129,10 +114,8 @@ class Transformation extends munit.FunSuite {
         |}
         |""".stripMargin
 
-    val query = QueryFactory.create(sparql)
-    val queryPattern = query.getQueryPattern
-
-    val parsed = parseElement(queryPattern)
+    val parser: SparqlParser = JenaSparqlParser
+    val parsed = parser.parse(sparql)
     assert(parsed != null)
 
     // Make sure we only discovered one BGP
@@ -170,10 +153,8 @@ class Transformation extends munit.FunSuite {
         |}
         |""".stripMargin
 
-    val query = QueryFactory.create(sparql)
-    val queryPattern = query.getQueryPattern
-
-    val parsed = parseElement(queryPattern)
+    val parser: SparqlParser = JenaSparqlParser
+    val parsed = parser.parse(sparql)
     assert(parsed != null)
     // printQueryNode(parsed)
   }

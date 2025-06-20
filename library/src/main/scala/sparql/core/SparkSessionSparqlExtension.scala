@@ -2,7 +2,6 @@ package sparql.core
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.graphframes.GraphFrame
-import sparql.core.executionstrategy.HybridFallbackStrategy
 import sparql.core.graphstore.MapGraphStore
 
 import scala.collection.concurrent.TrieMap
@@ -24,10 +23,7 @@ object SparkSessionSparqlExtension {
     def graphStore: GraphStore =
       sessionToStore.getOrElseUpdate(spark, new MapGraphStore())
 
-    def sparql(
-        query: String,
-        execStrategy: SparqlExecutionStrategy = HybridFallbackStrategy
-    ): DataFrame = {
+    def sparql(query: String)(implicit execStrategy: SparqlExecutionStrategy): DataFrame = {
       execStrategy.execute(query)(spark)
     }
 

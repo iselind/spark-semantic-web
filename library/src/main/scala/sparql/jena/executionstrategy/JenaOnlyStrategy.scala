@@ -1,8 +1,10 @@
-package sparql.core.executionstrategy
+package sparql.jena.executionstrategy
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import sparql.core.SparkSessionSparqlExtension.SparqlEnhancedSession
-import sparql.core.{FallbackHandler, SparqlExecutionStrategy}
+import sparql.core.SparqlExecutionStrategy
+import sparql.core.executionstrategy.NoSuchGraph
+import sparql.jena.FallbackHandler
 
 /** Assumes the graph to use is registered as "Jena" in the spark session
   */

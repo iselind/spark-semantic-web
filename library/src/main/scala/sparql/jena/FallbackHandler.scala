@@ -1,4 +1,4 @@
-package sparql.core
+package sparql.jena
 
 import org.apache.jena.query.{QueryExecutionFactory, QueryFactory}
 import org.apache.jena.rdf.model.{Model, ModelFactory}
@@ -6,6 +6,7 @@ import org.apache.jena.riot.RDFDataMgr
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.graphframes.GraphFrame
+import sparql.core.NoSuchModel
 
 import scala.collection.JavaConverters._
 

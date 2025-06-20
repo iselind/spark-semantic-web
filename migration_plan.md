@@ -4,36 +4,6 @@ This checklist outlines the steps to modularize Jena support from the `library` 
 
 ---
 
-## 🧩 Stage 2: Define Extensibility Layer
-
-- In `sparql.core.ext`, define the following (start minimal):
-  - `RDFTriple`
-  - `RDFModel`
-  - `RDFLoader`
-  - `SparqlEngine`
-  - Any needed factories or typeclasses
-- In `sparql.jena`, implement these traits using Jena
-- Refactor any `core` logic to use traits instead of Jena directly
-- Ensure no Jena types leak into `core` public APIs
-
-✅ *Goal: All Jena usage lives behind defined interfaces.*
-
----
-
-## 🔁 Stage 3: Extract Jena-Specific Logic
-
-- Identify all classes that depend on Jena
-  - `grep -Rns "org.apache.jena" library/src app/src`
-- One-by-one:
-  - Move Jena-specific logic to `sparql.jena`
-  - Replace use in `sparql.core` with abstract traits
-  - Update internal tests accordingly
-- Validate functionality remains correct
-
-✅ *Goal: `sparql.core` is now fully backend-agnostic.*
-
----
-
 ## 📦 Stage 4: Create `jena-support` Module
 
 - Add new sbt module: `jena-support/`

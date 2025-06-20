@@ -1,25 +1,15 @@
-package sparql.core
+package sparql.jena
 
 import org.apache.jena.query.QueryFactory
 import org.apache.jena.sparql.core.TriplePath
 import org.apache.jena.sparql.expr.Expr
 import org.apache.jena.sparql.syntax._
+import sparql.core.QueryNode
+import sparql.core.ext.SparqlParser
 
 import scala.collection.JavaConverters._
 
-// Representation of recursive query structure with fallback tracking
-case class QueryNode(
-    bgp: List[TriplePath] = List(),
-    filters: List[Expr] = List(),
-    unions: List[List[QueryNode]] = List(),
-    optionals: List[QueryNode] = List(),
-    others: List[String] = List(),
-    aborted: Boolean = false,
-    abortReason: Option[String] = None,
-    requiresFallback: Boolean = false
-)
-
-object SparqlParser {
+object JenaSparqlParser extends SparqlParser {
 
   def parse(query: String): QueryNode = {
     val q = QueryFactory.create(query)
@@ -28,7 +18,7 @@ object SparqlParser {
     parseElement(queryPattern)
   }
 
-  def parseElement(element: Element): QueryNode = {
+  private def parseElement(element: Element): QueryNode = {
     var aborted = false
     var reason: Option[String] = None
 
@@ -76,8 +66,8 @@ object SparqlParser {
 
     walk(element)
     QueryNode(
-      bgp = bgp.toList,
-      filters = filters.toList,
+      bgp = bgp.toList.map(sparql.jena.Triple.from),
+      filters = filters.toList.map(sparql.jena.FilterExpression.from),
       unions = unions.toList,
       optionals = optionals.toList,
       others = others.toList,
@@ -87,7 +77,7 @@ object SparqlParser {
     )
   }
 
-  def printQueryNode(node: QueryNode, indent: String = ""): Unit = {
+  private def printQueryNode(node: QueryNode, indent: String = ""): Unit = {
     if (node.aborted) {
       println(
         s"${indent}⛔ Parsing Aborted: ${node.abortReason.getOrElse("Unknown reason")}"
