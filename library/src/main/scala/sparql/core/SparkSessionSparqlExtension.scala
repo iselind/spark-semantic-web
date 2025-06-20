@@ -1,9 +1,9 @@
-package sparql
+package sparql.core
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.graphframes.GraphFrame
-import sparql.executionstrategy.HybridFallbackStrategy
-import sparql.graphstore.MapGraphStore
+import sparql.core.executionstrategy.HybridFallbackStrategy
+import sparql.core.graphstore.MapGraphStore
 
 import scala.collection.concurrent.TrieMap
 

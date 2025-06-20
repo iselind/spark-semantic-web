@@ -4,19 +4,6 @@ This checklist outlines the steps to modularize Jena support from the `library` 
 
 ---
 
-## 🧱 Stage 1: Restructure Package Layout in `library`
-
-- Rename package `sparql` → `sparql.core`
-- Create new packages:
-  - `sparql.core.ext` ← for abstraction traits
-  - `sparql.jena`     ← for current Jena-based implementations (initially remains in `library`)
-- Update all existing import paths
-- Ensure all code compiles and tests pass
-
-✅ *Goal: Setup future structure without affecting functionality.*
-
----
-
 ## 🧩 Stage 2: Define Extensibility Layer
 
 - In `sparql.core.ext`, define the following (start minimal):

@@ -1,7 +1,7 @@
-package sparql.executionstrategy
+package sparql.core.executionstrategy
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import sparql.{SparqlExecutionStrategy, SparqlParser}
+import sparql.core.{SparqlExecutionStrategy, SparqlParser}
 
 object HybridFallbackStrategy extends SparqlExecutionStrategy {
   override def execute(query: String)(implicit

@@ -1,4 +1,4 @@
-package sparql
+package sparql.core
 
 import org.apache.jena.query.{QueryExecutionFactory, QueryFactory}
 import org.apache.jena.rdf.model.{Model, ModelFactory}

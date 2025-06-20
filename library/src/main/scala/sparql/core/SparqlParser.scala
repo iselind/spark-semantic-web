@@ -1,4 +1,4 @@
-package sparql
+package sparql.core
 
 import org.apache.jena.query.QueryFactory
 import org.apache.jena.sparql.core.TriplePath

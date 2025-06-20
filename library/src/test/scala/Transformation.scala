@@ -1,7 +1,7 @@
 import org.apache.jena.graph.{Node, NodeFactory, Triple}
 import org.apache.jena.query.QueryFactory
-import sparql.BgpToGraphFrame.buildMotifAndFilter
-import sparql.SparqlParser.parseElement
+import sparql.core.BgpToGraphFrame.buildMotifAndFilter
+import sparql.core.SparqlParser.parseElement
 
 /*
  * case class QueryNode(

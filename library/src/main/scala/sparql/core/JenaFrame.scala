@@ -1,4 +1,4 @@
-package sparql
+package sparql.core
 
 import org.apache.jena.rdf.model.{Model, ModelFactory, Statement}
 import org.apache.jena.riot.RDFDataMgr

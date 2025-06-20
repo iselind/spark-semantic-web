@@ -1,7 +1,7 @@
-package sparql.executionstrategy
+package sparql.core.executionstrategy
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import sparql.{QueryNode, SparqlExecutionStrategy, SparqlParser}
+import sparql.core.{QueryNode, SparqlExecutionStrategy, SparqlParser}
 
 object SparkOnlyStrategy extends SparqlExecutionStrategy {
   override def execute(query: String)(implicit

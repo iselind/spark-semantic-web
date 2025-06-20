@@ -1,7 +1,7 @@
-package sparql.graphstore
+package sparql.core.graphstore
 
 import org.graphframes.GraphFrame
-import sparql.GraphStore
+import sparql.core.GraphStore
 
 class MapGraphStore extends GraphStore {
   private val graphs = scala.collection.mutable.Map.empty[String, GraphFrame]

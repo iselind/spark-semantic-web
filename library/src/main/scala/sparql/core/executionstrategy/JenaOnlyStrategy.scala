@@ -1,8 +1,8 @@
-package sparql.executionstrategy
+package sparql.core.executionstrategy
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import sparql.SparkSessionSparqlExtension._
-import sparql.{FallbackHandler, SparqlExecutionStrategy}
+import sparql.core.SparkSessionSparqlExtension.SparqlEnhancedSession
+import sparql.core.{FallbackHandler, SparqlExecutionStrategy}
 
 /** Assumes the graph to use is registered as "Jena" in the spark session
   */

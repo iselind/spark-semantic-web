@@ -1,8 +1,8 @@
 import munit.FunSuite
 import org.apache.spark.sql.SparkSession
-import sparql.JenaFrame
-import sparql.SparkSessionSparqlExtension._
-import sparql.executionstrategy.JenaOnlyStrategy
+import sparql.core.JenaFrame
+import sparql.core.SparkSessionSparqlExtension._
+import sparql.core.executionstrategy.JenaOnlyStrategy
 
 class SparqlQuerySuite extends FunSuite {
 
