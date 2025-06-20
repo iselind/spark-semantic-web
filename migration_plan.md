@@ -4,31 +4,6 @@ This checklist outlines the steps to modularize Jena support from the `library` 
 
 ---
 
-## 📚 Stage 8: Documentation & Final Polish
-
-- Add `README.md` to `sparql.core.ext/`:
-  - Describe purpose of traits
-  - List required traits to implement a new engine
-  - Link to `sparql.jena` as a reference implementation
-- (Optional) Add `EXTENDING.md` guide with trait descriptions & wiring pattern
-- Add `README.md` to jena-support
-  - What this module provides (a concrete Jena implementation of the sparql.core.ext traits)
-  - How to use it in sbt:
-    ```
-    libraryDependencies += "com.example" %% "jena-support" % "1.0.0"
-    ```
-  - How to wire it
-    ```
-    import sparql.jena.JenaSupport
-    val engine = JenaSupport.defaultEngine()
-    ```
-  - Any transitive dependencies (e.g., Spark, Jena versions) to be aware of
-  - Link to `sparql.core.ext` for trait-level documentation
-
-✅ *Goal: Clear contributor story + modular design knowledge captured.*
-
----
-
 ## 🧼 Stage 9: Verification by clean build
 
 - Check sbt `clean compile test` for all modules

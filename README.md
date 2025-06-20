@@ -1,6 +1,10 @@
 # Spark Semantic Web
 
-This project is split into a library and an example application using that library.
+This project is split into three pieces:
+
+- A library with the core functionality.
+- Jena specific library providing Jena based implementations of things the library is missing but require to work.
+- An example application using the Jena library to exemplify usage
 
 The intention of this project is to explore the possibility of using Apache
 Spark's query optimizations to speed up SparkQL queries.
@@ -15,65 +19,28 @@ You run it by executing `sbt app/run`.
 
 Introduces a `sparql()` to the Apache Spark context.
 
-The implementation of `sparql()` takes a sparql query and runs it through
-Apache Spark if it doesn't contain, currently, unsupported features.
-Otherwise,
-the execution is handled by Apache Jena.
+The implementation of `sparql()` takes a sparql query and runs it. How that execution works is up to the implicit
+execution strategy available.
 
 THe end goal is that Apache Jena will never have to be used to execute SparQL.
-Instead, it will be executed entirely self-sufficiently by Apache Spark.
+Instead, it will be executed entirely self-sufficiently by Apache Spark. For simplicity we will use something
+implementing `sparql.core.ext.SparqlParser` to properly dissect the query and figure out if we can transform the query
+into something Apache Spark can execute.
 
-# Design
+Beyond the `sparql()` addition we have also added the possibility to register graph frames with associated names. The
+intention is that these names will later be referenced in the Sparql queries, similarlly to how Apache Spark supports
+registering table views.
 
-The high-level API looks like this:
+## The API
+
+The high-level API provided looks like this:
 
 ```scala
-def sparql(query: String,
-           graphStore: GraphStore,
-           strategy: SparqlExecutionStrategy = HybridFallbackStrategy): DataFrame = {
+def registerGraph(frame: GraphFrame, name: String)
+
+def sparql(query: String): DataFrame = {
   strategy.execute(query, graphStore)(spark)
 }
 ```
 
-## GraphStore
-
-The GraphStore is defined like so:
-
-```scala
-trait GraphStore {
-  /** Get a graph by name; error or Option if not found */
-  def getGraph(name: String): Option[GraphFrame]
-
-  /** Register or replace a named graph */
-  def putGraph(name: String, graph: GraphFrame): Unit
-
-  /** Remove a named graph */
-  def removeGraph(name: String): Unit
-
-  /** List all registered graph names */
-  def listGraphs(): Seq[String]
-}
-```
-
-The reasoning behind this design:
-
-- enable plugging in any solution for storing Graphs, including mocks
-- Mimic how the SQL view registration works
-
-```mermaid
-graph TD
-    SparkSession --> sparql["sparkql()"];
-    GraphFrame["GraphFrame from\nSpark's GraphX"] --> sparql["sparkql()"]
-    GraphStore
-```
-
-```mermaid
-classDiagram
-    SparqlExecutionStrategy <|-- SparkOnlyStrategy
-    SparqlExecutionStrategy <|-- JenaOnlyStrategy
-    SparqlExecutionStrategy <|-- HybridFallbackStrategy
-
-    class SparqlExecutionStrategy {
-        +execute(query: String, store: GraphStore, strategy: SparqlExecutionStrategy)(implicit spark: SparkSession): DataFrame
-    }
-```
+and can be found in `SparkSessionSparqlExtension.scala`
