@@ -77,38 +77,4 @@ object JenaSparqlParser extends SparqlParser {
     )
   }
 
-  private def printQueryNode(node: QueryNode, indent: String = ""): Unit = {
-    if (node.aborted) {
-      println(
-        s"${indent}⛔ Parsing Aborted: ${node.abortReason.getOrElse("Unknown reason")}"
-      )
-      return
-    }
-    if (node.requiresFallback) {
-      println(s"${indent}⚠️ Query requires fallback to Jena execution")
-    }
-    if (node.bgp.nonEmpty) {
-      println(s"${indent}BGP:")
-      node.bgp.foreach(t => println(s"${indent}  $t"))
-    }
-    if (node.filters.nonEmpty) {
-      println(s"${indent}FILTERs:")
-      node.filters.foreach(f => println(s"${indent}  $f"))
-    }
-    if (node.optionals.nonEmpty) {
-      println(s"${indent}OPTIONALs:")
-      node.optionals.foreach(o => printQueryNode(o, indent + "  "))
-    }
-    if (node.unions.nonEmpty) {
-      println(s"${indent}UNIONs:")
-      node.unions.foreach { branchList =>
-        println(s"${indent}  UNION Branches:")
-        branchList.foreach(branch => printQueryNode(branch, indent + "    "))
-      }
-    }
-    if (node.others.nonEmpty) {
-      println(s"${indent}Other elements:")
-      node.others.foreach(o => println(s"${indent}  $o"))
-    }
-  }
 }
