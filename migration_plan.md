@@ -1,10 +1,12 @@
 # ✅ SPARQL Refactor Migration Checklist
 
-This checklist outlines the steps to modularize Jena support from the `library` into a standalone `jena-support` module, and introduce a clean plugin-style architecture.
+This checklist outlines the steps to modularize Jena support from the `library` into a standalone `jena-support` module,
+and introduce a clean plugin-style architecture.
 
 ---
 
 ## 📚 Stage 10: Enforcing architecture
+
 - Add Scalafix to project/plugins.sbt
   ```
   addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.10.4")
