@@ -1,6 +1,7 @@
 package sparql.core
 
-import sparql.core.ext.{Node, Triple}
+import sparql.core.ext.Node
+import sparql.core.ext.Triple
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer

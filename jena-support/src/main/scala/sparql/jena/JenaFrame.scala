@@ -1,6 +1,8 @@
 package sparql.jena
 
-import org.apache.jena.rdf.model.{Model, ModelFactory, Statement}
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.Statement
 import org.apache.jena.riot.RDFDataMgr
 import org.apache.spark.sql.SparkSession
 import org.graphframes.GraphFrame

@@ -7,7 +7,11 @@ lazy val commonSettings = Seq(
   scalaVersion := scalaVer,
   organization := "com.example",
   libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
-  version := "0.1.0-SNAPSHOT"
+  version := "0.1.0-SNAPSHOT",
+  Compile / scalacOptions ++= Seq(
+    "-Ywarn-unused",
+    "-Ywarn-unused-import"
+  )
 )
 
 lazy val formatOnCompileSettings = Seq(
@@ -60,3 +64,12 @@ lazy val root = (project in file("."))
 enablePlugins(ScalafmtPlugin)
 addCommandAlias("format", "scalafmtAll")
 addCommandAlias("checkFormat", "scalafmtCheckAll")
+enablePlugins(ScalafixPlugin)
+
+inThisBuild(
+  List(
+    semanticdbEnabled := true,
+    semanticdbVersion := "4.4.34",
+    scalaVersion := "2.12.15"
+  )
+)

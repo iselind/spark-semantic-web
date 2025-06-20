@@ -1,6 +1,7 @@
 package sparql.core
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.SparkSession
 import org.graphframes.GraphFrame
 import sparql.core.graphstore.MapGraphStore
 

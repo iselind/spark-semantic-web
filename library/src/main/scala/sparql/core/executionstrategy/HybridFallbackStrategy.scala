@@ -1,6 +1,7 @@
 package sparql.core.executionstrategy
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.SparkSession
 import org.apache.zookeeper.KeeperException.BadArgumentsException
 import sparql.core.SparqlExecutionStrategy
 import sparql.core.ext.SparqlParser

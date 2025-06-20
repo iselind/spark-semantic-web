@@ -1,6 +1,7 @@
 package sparql.core
 
-import sparql.core.ext.{FilterExpression, Triple}
+import sparql.core.ext.FilterExpression
+import sparql.core.ext.Triple
 
 // Representation of recursive query structure with fallback tracking
 case class QueryNode(
