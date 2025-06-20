@@ -18,7 +18,8 @@ object SparkSessionSparqlExtension {
   implicit class SparqlEnhancedSession(spark: SparkSession) {
 
     /** Lazily initialized store of registered graphs for this SparkSession.
-     * Intended for advanced and internal usage — prefer `registerGraph` for most use cases.
+      * Intended for advanced and internal usage — prefer `registerGraph` for
+      * most use cases.
       */
     def graphStore: GraphStore =
       sessionToStore.getOrElseUpdate(spark, new MapGraphStore())

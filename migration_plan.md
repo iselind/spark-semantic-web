@@ -4,15 +4,6 @@ This checklist outlines the steps to modularize Jena support from the `library` 
 
 ---
 
-## 🧼 Stage 9: Verification by clean build
-
-- Check sbt `clean compile test` for all modules
-- Confirm classpath is correct (no hidden Jena in `library`)
-
-✅ *Goal: Everything modular, documented, tested, and ready for distribution.*
-
----
-
 ## 📚 Stage 10: Enforcing architecture
 - Add Scalafix to project/plugins.sbt
   ```
