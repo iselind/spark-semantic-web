@@ -1,19 +1,28 @@
 import munit.FunSuite
 import org.apache.spark.sql.SparkSession
+import sparql.core.BasicGraphResolver
 import sparql.core.SparkSessionSparqlExtension._
-import sparql.core.SparqlExecutionStrategy
-import sparql.jena.JenaFrame
+import sparql.core.context.SparQLContext
+import sparql.core.graphstore.MapGraphStore
 import sparql.jena.executionstrategy.JenaOnlyStrategy
+import sparql.jena.{JenaFrame, JenaSparqlParser}
 
 class SparqlQuerySuite extends FunSuite {
 
-  private lazy val sparkSession: SparkSession = SparkSession
+  private val sparkSession: SparkSession = SparkSession
     .builder()
     .appName("SparqlTestSuite")
     .master("local[*]")
     .getOrCreate()
 
   import sparkSession.implicits._
+
+  private implicit val sparqlContext: SparQLContext = SparQLContext(
+    JenaSparqlParser,
+    new BasicGraphResolver,
+    new MapGraphStore,
+    JenaOnlyStrategy
+  )
 
   override def afterAll(): Unit = {
     sparkSession.stop()
@@ -30,9 +39,8 @@ class SparqlQuerySuite extends FunSuite {
         SELECT ?name WHERE { ?person foaf:name ?name }
       """
 
-    val strategy: SparqlExecutionStrategy = JenaOnlyStrategy
     val actualNames: List[String] = sparkSession
-      .sparql(query)(strategy)
+      .sparql(query)
       .select("name")
       .as[String]
       .collect()

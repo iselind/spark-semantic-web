@@ -1,10 +1,9 @@
 package sparql.jena.executionstrategy
 
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.SparkSession
-import sparql.core.SparkSessionSparqlExtension.SparqlEnhancedSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import sparql.core.SparqlExecutionStrategy
-import sparql.core.executionstrategy.NoSuchGraph
+import sparql.core.context.SparQLContext
+import sparql.core.exception.NoSuchGraph
 import sparql.jena.FallbackHandler
 
 /** Assumes the graph to use is registered as "Jena" in the spark session
@@ -20,8 +19,8 @@ object JenaOnlyStrategy extends SparqlExecutionStrategy {
     */
   def execute(
       query: String
-  )(implicit spark: SparkSession): DataFrame = {
-    val graphStore = spark.graphStore
+  )(implicit spark: SparkSession, sparqlContext: SparQLContext): DataFrame = {
+    val graphStore = sparqlContext.graphStore
     if (graphStore.listGraphs().size != 1)
       throw IncompatibleGraphStore("Unexpected number of named graphs")
 

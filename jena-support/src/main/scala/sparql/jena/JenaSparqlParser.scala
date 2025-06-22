@@ -5,9 +5,7 @@ import org.apache.jena.sparql.core.TriplePath
 import org.apache.jena.sparql.expr.Expr
 import org.apache.jena.sparql.syntax._
 import sparql.core.ext.SparqlParser
-import sparql.core.query.QueryNode
-import sparql.core.query.SelectNode
-import sparql.core.query.WhereNode
+import sparql.core.query.{QueryNode, SelectNode, WhereNode}
 
 import scala.collection.JavaConverters._
 
