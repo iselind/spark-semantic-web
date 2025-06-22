@@ -21,11 +21,12 @@ class HybridFallbackStrategy(
   override def execute(query: String)(implicit
       spark: SparkSession
   ): DataFrame = {
-    val ast = parser.parse(query)
+    val qn = parser.parse(query)
+    val ast = qn.where
     if (ast.requiresFallback || ast.aborted) {
       fallback.execute(query)
     } else {
-      sparqlParser.execute(ast)
+      sparqlParser.execute(qn)
     }
   }
 }

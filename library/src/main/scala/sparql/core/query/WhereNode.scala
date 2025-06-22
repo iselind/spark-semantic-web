@@ -1,14 +1,14 @@
-package sparql.core
+package sparql.core.query
 
 import sparql.core.ext.FilterExpression
 import sparql.core.ext.Triple
 
 // Representation of recursive query structure with fallback tracking
-case class QueryNode(
+case class WhereNode(
     bgp: List[Triple] = List(),
     filters: List[FilterExpression] = List(),
-    unions: List[List[QueryNode]] = List(),
-    optionals: List[QueryNode] = List(),
+    unions: List[List[WhereNode]] = List(),
+    optionals: List[WhereNode] = List(),
     others: List[String] = List(),
     aborted: Boolean = false,
     abortReason: Option[String] = None,

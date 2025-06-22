@@ -4,8 +4,10 @@ import org.apache.jena.query.QueryFactory
 import org.apache.jena.sparql.core.TriplePath
 import org.apache.jena.sparql.expr.Expr
 import org.apache.jena.sparql.syntax._
-import sparql.core.QueryNode
 import sparql.core.ext.SparqlParser
+import sparql.core.query.QueryNode
+import sparql.core.query.SelectNode
+import sparql.core.query.WhereNode
 
 import scala.collection.JavaConverters._
 
@@ -15,17 +17,19 @@ object JenaSparqlParser extends SparqlParser {
     val q = QueryFactory.create(query)
     val queryPattern = q.getQueryPattern
 
-    parseElement(queryPattern)
+    val vars = q.getResultVars.asScala.toList
+    val uris = q.getResultURIs.asScala.toList.map(new Node(_))
+    QueryNode(SelectNode(vars, uris), parseElement(queryPattern))
   }
 
-  private def parseElement(element: Element): QueryNode = {
+  private def parseElement(element: Element): WhereNode = {
     var aborted = false
     var reason: Option[String] = None
 
     val bgp = scala.collection.mutable.ListBuffer[TriplePath]()
     val filters = scala.collection.mutable.ListBuffer[Expr]()
-    val unions = scala.collection.mutable.ListBuffer[List[QueryNode]]()
-    val optionals = scala.collection.mutable.ListBuffer[QueryNode]()
+    val unions = scala.collection.mutable.ListBuffer[List[WhereNode]]()
+    val optionals = scala.collection.mutable.ListBuffer[WhereNode]()
     val others = scala.collection.mutable.ListBuffer[String]()
 
     val fallbackMarkers =
@@ -65,7 +69,7 @@ object JenaSparqlParser extends SparqlParser {
     }
 
     walk(element)
-    QueryNode(
+    WhereNode(
       bgp = bgp.toList.map(sparql.jena.Triple.from),
       filters = filters.toList.map(sparql.jena.FilterExpression.from),
       unions = unions.toList,

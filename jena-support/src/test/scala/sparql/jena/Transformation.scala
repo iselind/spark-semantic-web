@@ -32,7 +32,8 @@ class Transformation extends munit.FunSuite {
         |""".stripMargin
 
     val parser: SparqlParser = JenaSparqlParser
-    val parsed = parser.parse(sparql)
+    val qn = parser.parse(sparql)
+    val parsed = qn.where
     assert(parsed != null)
 
     // Make sure we only discovered one BGP
@@ -115,7 +116,8 @@ class Transformation extends munit.FunSuite {
         |""".stripMargin
 
     val parser: SparqlParser = JenaSparqlParser
-    val parsed = parser.parse(sparql)
+    val qn = parser.parse(sparql)
+    val parsed = qn.where
     assert(parsed != null)
 
     // Make sure we only discovered one BGP
