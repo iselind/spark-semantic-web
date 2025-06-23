@@ -182,6 +182,28 @@ class Transformation extends munit.FunSuite {
       result.filter,
       "e0.relationship = 'http://xmlns.com/foaf/0.1/name' AND e1.relationship = 'http://xmlns.com/foaf/0.1/age' AND lit3.value = '25'"
     )
+  }
 
+  test("BGP from QueryNode to motif and filter") {
+    val sparql =
+      """
+        |SELECT ?s ?name WHERE {
+        |  ?s <http://xmlns.com/foaf/0.1/name> ?name .
+        |}
+        |""".stripMargin
+
+    val parser: SparqlParser = JenaSparqlParser
+    val qn = parser.parse(sparql)
+
+    val result = buildMotifAndFilter(qn.where.bgp)
+
+    assertEquals(result.motif, "(v1)-[e0]->(v2)")
+    assertEquals(
+      result.filter,
+      "e0.relationship = 'http://xmlns.com/foaf/0.1/name'"
+    )
+
+    assertEquals(qn.select.vars, List("s", "name"))
+    assertEquals(qn.select.uris, List())
   }
 }
