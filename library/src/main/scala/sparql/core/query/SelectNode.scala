@@ -11,13 +11,14 @@ case class SelectNode(vars: List[String], uris: List[Node], where: WhereNode) ex
   override def run(aliasMap: Map[String, String], graphResolver: GraphResolver)(frame: Option[GraphFrame]): DataFrame = {
     val f = where.run(aliasMap = aliasMap, graphResolver = graphResolver)(frame)
 
+    val varsSet = vars.toSet
     val realKeyMap: List[Column] = aliasMap.view
-      .filterKeys(vars.toSet)
+      .filter { case (k, _) => varsSet.contains(k) }
       .map { case (k, v) => col(v).alias(k) }
       .toList
 
-    // .map { case (k, v) => col(v).alias(k) }
-
     f.vertices.select(realKeyMap: _*)
+
+    // I have no clue what to do with the parameter "uris"
   }
 }
