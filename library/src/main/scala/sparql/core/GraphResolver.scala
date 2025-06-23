@@ -21,7 +21,7 @@ trait GraphResolver {
   def getGraph(uri: String): Option[GraphFrame]
 }
 
-class BasicGraphResolver extends GraphResolver {
+class BasicGraphResolver(store: GraphStore) extends GraphResolver {
 
   /** Resolve URIs for named graphs.
     *
@@ -38,5 +38,26 @@ class BasicGraphResolver extends GraphResolver {
     *   Some(GraphFrame) if a graph with the provided uri was found, and it was
     *   possible to convert it to a GraphFrame.
     */
-  override def getGraph(uri: String): Option[GraphFrame] = ???
+  override def getGraph(uri: String = null): Option[GraphFrame] = {
+    if (uri == null) {
+      val graphs = store.listGraphs()
+      if (graphs.size == 1) return store.getGraph(graphs.head)
+      else return None
+    }
+
+    if (uri.contains("://")) {
+      val parts = uri.split("://")
+      assert(parts.size == 2)
+      val (schema, graphName) = parts
+      schema match {
+        case "spark" => store.getGraph(graphName)
+        case "local" => store.getGraph(graphName)
+        case _ => ???
+      }
+    }
+
+    // TODO: uri is malformed if we get here. Report it.
+
+    None
+  }
 }

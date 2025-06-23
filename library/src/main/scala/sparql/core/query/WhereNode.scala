@@ -1,6 +1,9 @@
 package sparql.core.query
 
-import sparql.core.ext.{FilterExpression, Triple}
+import org.graphframes.GraphFrame
+import sparql.core.GraphResolver
+import sparql.core.ext.FilterExpression
+import sparql.core.ext.Triple
 
 // Representation of recursive query structure with fallback tracking
 case class WhereNode(
@@ -9,7 +12,7 @@ case class WhereNode(
     unions: List[List[WhereNode]] = List(),
     optionals: List[WhereNode] = List(),
     others: List[String] = List(),
-    aborted: Boolean = false,
-    abortReason: Option[String] = None,
     requiresFallback: Boolean = false
-)
+                    ) extends Executor {
+  override def run(aliasMap: Map[String, String], graphResolver: GraphResolver)(frame: Option[GraphFrame]): GraphFrame = ???
+}

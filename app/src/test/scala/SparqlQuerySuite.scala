@@ -5,7 +5,8 @@ import sparql.core.SparkSessionSparqlExtension._
 import sparql.core.context.SparQLContext
 import sparql.core.graphstore.MapGraphStore
 import sparql.jena.executionstrategy.JenaOnlyStrategy
-import sparql.jena.{JenaFrame, JenaSparqlParser}
+import sparql.jena.JenaFrame
+import sparql.jena.JenaSparqlParser
 
 class SparqlQuerySuite extends FunSuite {
 
@@ -17,10 +18,11 @@ class SparqlQuerySuite extends FunSuite {
 
   import sparkSession.implicits._
 
+  val graphStore = new MapGraphStore
   private implicit val sparqlContext: SparQLContext = SparQLContext(
     JenaSparqlParser,
-    new BasicGraphResolver,
-    new MapGraphStore,
+    new BasicGraphResolver(graphStore),
+    graphStore,
     JenaOnlyStrategy
   )
 

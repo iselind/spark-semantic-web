@@ -1,11 +1,15 @@
 package sparql.jena
 
 import org.apache.jena.query.QueryFactory
+import org.apache.jena.query.QueryType
 import org.apache.jena.sparql.core.TriplePath
 import org.apache.jena.sparql.expr.Expr
 import org.apache.jena.sparql.syntax._
+import sparql.core.exception.UnsupportedQuery
 import sparql.core.ext.SparqlParser
-import sparql.core.query.{QueryNode, SelectNode, WhereNode}
+import sparql.core.query.QueryNode
+import sparql.core.query.SelectNode
+import sparql.core.query.WhereNode
 
 import scala.collection.JavaConverters._
 
@@ -13,6 +17,14 @@ object JenaSparqlParser extends SparqlParser {
 
   def parse(query: String): QueryNode = {
     val q = QueryFactory.create(query)
+    q.queryType() match {
+      case QueryType.SELECT => parseSelect(query)
+      case default =>
+        throw UnsupportedQuery("Only SELECT statements are supported for now")
+    }
+  }
+
+  private def parseSelect(query: String): QueryNode = {
     val queryPattern = q.getQueryPattern
 
     val vars = q.getResultVars.asScala.toList

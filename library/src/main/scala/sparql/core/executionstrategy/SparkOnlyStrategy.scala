@@ -1,9 +1,11 @@
 package sparql.core.executionstrategy
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.SparkSession
 import sparql.core.SparqlExecutionStrategy
 import sparql.core.context.SparQLContext
-import sparql.core.exception.{ParsingAborted, UnsupportedQuery}
+import sparql.core.exception.ParsingAborted
+import sparql.core.exception.UnsupportedQuery
 import sparql.core.ext.SparqlParser
 import sparql.core.query.QueryNode
 
@@ -15,8 +17,14 @@ class SparkOnlyStrategy(parser: SparqlParser) extends SparqlExecutionStrategy {
     val ast = qn.where
     if (ast.requiresFallback)
       throw UnsupportedQuery()
-    if (ast.aborted)
-      throw ParsingAborted(ast.abortReason)
+    if (ast.aborted) {
+      ast.abortReason match {
+        case Some(a) =>
+          throw ParsingAborted(a)
+        case None =>
+          throw ParsingAborted("Unknown reason")
+      }
+    }
 
     execute(qn)
   }
