@@ -1,14 +1,13 @@
 package sparql.core.query
 
-import org.apache.spark.sql.Column
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.col
 import org.graphframes.GraphFrame
 import sparql.core.GraphResolver
 import sparql.core.ext.Node
 
 case class SelectNode(vars: List[String], uris: List[Node], where: WhereNode) extends Executor[DataFrame] {
   override def run(aliasMap: Map[String, String], graphResolver: GraphResolver)(frame: Option[GraphFrame]): DataFrame = {
+    /*
     val f = where.run(aliasMap = aliasMap, graphResolver = graphResolver)(frame)
 
     val varsSet = vars.toSet
@@ -20,5 +19,7 @@ case class SelectNode(vars: List[String], uris: List[Node], where: WhereNode) ex
     f.vertices.select(realKeyMap: _*)
 
     // I have no clue what to do with the parameter "uris"
+    */
+    ???
   }
 }

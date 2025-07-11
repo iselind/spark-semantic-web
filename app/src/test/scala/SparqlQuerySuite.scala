@@ -4,9 +4,9 @@ import sparql.core.BasicGraphResolver
 import sparql.core.SparkSessionSparqlExtension._
 import sparql.core.context.SparQLContext
 import sparql.core.graphstore.MapGraphStore
-import sparql.jena.executionstrategy.JenaOnlyStrategy
 import sparql.jena.JenaFrame
 import sparql.jena.JenaSparqlParser
+import sparql.jena.executionstrategy.JenaOnlyStrategy
 
 class SparqlQuerySuite extends FunSuite {
 
@@ -43,6 +43,7 @@ class SparqlQuerySuite extends FunSuite {
 
     val actualNames: List[String] = sparkSession
       .sparql(query)
+      .asDataframe  // TODO: Shouldn't be needed because of implicits in the SparqlResult subclasses
       .select("name")
       .as[String]
       .collect()

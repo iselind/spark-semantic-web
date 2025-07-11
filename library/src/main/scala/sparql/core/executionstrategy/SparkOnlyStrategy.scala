@@ -1,38 +1,30 @@
 package sparql.core.executionstrategy
 
-import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.SparkSession
 import sparql.core.SparqlExecutionStrategy
+import sparql.core.SparqlResult
 import sparql.core.context.SparQLContext
-import sparql.core.exception.ParsingAborted
 import sparql.core.exception.UnsupportedQuery
-import sparql.core.ext.SparqlParser
-import sparql.core.query.QueryNode
+import sparql.core.ext.Ask
+import sparql.core.ext.Construct
+import sparql.core.ext.ParsedQuery
+import sparql.core.ext.Select
+import sparql.core.ext.Unsupported
 
-class SparkOnlyStrategy(parser: SparqlParser) extends SparqlExecutionStrategy {
+class SparkOnlyStrategy extends SparqlExecutionStrategy {
   override def execute(
       query: String
-  )(implicit spark: SparkSession, sparqlContext: SparQLContext): DataFrame = {
-    val qn: QueryNode = parser.parse(query)
-    val ast = qn.where
-    if (ast.requiresFallback)
-      throw UnsupportedQuery()
-    if (ast.aborted) {
-      ast.abortReason match {
-        case Some(a) =>
-          throw ParsingAborted(a)
-        case None =>
-          throw ParsingAborted("Unknown reason")
-      }
+  )(implicit spark: SparkSession, sparqlContext: SparQLContext): SparqlResult = {
+    val p: ParsedQuery = sparqlContext.sparqlParser.parse(query)
+    p match {
+      case a: Ask => execute(a)
+      case c: Construct => execute(c)
+      case s: Select => execute(s)
+      case Unsupported(q) => throw new UnsupportedQuery(q)
     }
-
-    execute(qn)
   }
 
-  def execute(ast: QueryNode)(implicit
-      spark: SparkSession
-  ): DataFrame = {
-    // TODO: Convert the AST to actual Spark stuff
-    ???
-  }
+  def execute(s: Select)(implicit spark: SparkSession, sparqlContext: SparQLContext): SparqlResult = ???
+  def execute(a: Ask)(implicit spark: SparkSession, sparqlContext: SparQLContext): SparqlResult = ???
+  def execute(c: Construct)(implicit spark: SparkSession, sparqlContext: SparQLContext): SparqlResult = ???
 }

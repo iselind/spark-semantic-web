@@ -1,6 +1,6 @@
 import sbt.Keys.resolvers
 
-val scalaVer = "2.12.15"
+val scalaVer = "2.12.20"
 val sparkVersion = "3.5.1"
 
 lazy val commonSettings = Seq(
@@ -69,7 +69,7 @@ enablePlugins(ScalafixPlugin)
 inThisBuild(
   List(
     semanticdbEnabled := true,
-    semanticdbVersion := "4.4.34",
-    scalaVersion := "2.12.15"
+    semanticdbVersion := scalafixSemanticdb.revision,
+    scalaVersion := scalaVer
   )
 )

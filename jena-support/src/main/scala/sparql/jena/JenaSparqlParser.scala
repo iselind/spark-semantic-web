@@ -1,35 +1,44 @@
 package sparql.jena
 
-import org.apache.jena.query.QueryFactory
-import org.apache.jena.query.QueryType
-import org.apache.jena.sparql.core.TriplePath
-import org.apache.jena.sparql.expr.Expr
-import org.apache.jena.sparql.syntax._
-import sparql.core.exception.UnsupportedQuery
+import sparql.core.ext.ParsedQuery
 import sparql.core.ext.SparqlParser
-import sparql.core.query.QueryNode
-import sparql.core.query.SelectNode
-import sparql.core.query.WhereNode
-
-import scala.collection.JavaConverters._
+import sparql.core.query.Executor
 
 object JenaSparqlParser extends SparqlParser {
 
+  override def parse(query: String): ParsedQuery = ???
+
+
+  /*
   def parse(query: String): QueryNode = {
     val q = QueryFactory.create(query)
     q.queryType() match {
-      case QueryType.SELECT => parseSelect(query)
-      case default =>
+      case QueryType.SELECT => parseSelect(q)
+      case _ =>
         throw UnsupportedQuery("Only SELECT statements are supported for now")
     }
   }
+  */
+  def parse[T](query: String): Executor[T] ={
+    /*
+    val q = QueryFactory.create(query)
+    val r: Executor[DataFrame] = parseSelect(q)
 
-  private def parseSelect(query: String): QueryNode = {
+    r match {
+      case e: Executor[T] => e
+      case _ => throw new IllegalArgumentException()
+    }
+    */
+    ???
+  } 
+
+  /*
+  private def parseSelect(q: Query): SelectNode = {
     val queryPattern = q.getQueryPattern
 
     val vars = q.getResultVars.asScala.toList
     val uris = q.getResultURIs.asScala.toList.map(new Node(_))
-    QueryNode(SelectNode(vars, uris), parseElement(queryPattern))
+    SelectNode(vars, uris, parseElement(queryPattern))
   }
 
   private def parseElement(element: Element): WhereNode = {
@@ -85,10 +94,7 @@ object JenaSparqlParser extends SparqlParser {
       unions = unions.toList,
       optionals = optionals.toList,
       others = others.toList,
-      aborted = aborted,
-      abortReason = reason,
-      requiresFallback = aborted || others.nonEmpty
     )
   }
-
+  */
 }

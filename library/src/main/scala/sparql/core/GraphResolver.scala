@@ -48,7 +48,8 @@ class BasicGraphResolver(store: GraphStore) extends GraphResolver {
     if (uri.contains("://")) {
       val parts = uri.split("://")
       assert(parts.size == 2)
-      val (schema, graphName) = parts
+      val schema = parts(0)
+      val graphName = parts(1)
       schema match {
         case "spark" => store.getGraph(graphName)
         case "local" => store.getGraph(graphName)
