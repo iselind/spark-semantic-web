@@ -3,10 +3,17 @@ package sparql.core.ext
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.SparkSession
 import org.graphframes.GraphFrame
+import sparql.core.query.BasicGraphPatternNode
+import sparql.core.query.SelectNode
+import sparql.core.query.WhereNode
 
 sealed trait ParsedQuery { self =>
   type Out
   def exec()(implicit spark: SparkSession): Out
+
+  var select: Option[SelectNode] = Option.empty
+  var bgp:Option[BasicGraphPatternNode] = Option.empty
+  var where:Option[WhereNode] = Option.empty
 }
 
 final case class Select() extends ParsedQuery {

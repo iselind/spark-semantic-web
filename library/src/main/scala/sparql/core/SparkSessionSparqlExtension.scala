@@ -23,4 +23,10 @@ object SparkSessionSparqlExtension {
       sparqlContext.graphStore.putGraph(name, frame)
     }
   }
+
+  implicit class SparqlEnhancedGraph(g: GraphFrame)(implicit spark: SparkSession,sparqlContext: SparQLContext) {
+    def sparql(query: String): SparqlResult = {
+      sparqlContext.execStrategy.execute(query)(spark, sparqlContext)
+    }
+  }
 }

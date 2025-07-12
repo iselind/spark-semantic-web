@@ -1,10 +1,16 @@
-package sparql.core
+package sparql.core.query
 
+import sparql.core.ext
 import sparql.core.ext.Node
 import sparql.core.ext.Triple
+import sparql.core.query.BgpToGraphFrame.MotifFilter
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+
+final case class BasicGraphPatternNode(ts: List[ext.Triple]) {
+  val motifs: MotifFilter = BgpToGraphFrame.buildMotifAndFilter(ts)
+}
 
 object BgpToGraphFrame {
   private sealed trait AliasInfo {

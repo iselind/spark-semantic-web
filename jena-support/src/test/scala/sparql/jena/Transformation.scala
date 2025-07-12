@@ -1,8 +1,9 @@
 package sparql.jena
 
-import sparql.core.BgpToGraphFrame.buildMotifAndFilter
 import sparql.core.ext
 import sparql.core.ext.SparqlParser
+import sparql.core.ext.ParsedQuery
+import sparql.core.query.BgpToGraphFrame.buildMotifAndFilter
 
 /** Tests the conversion from sparql to QueryNode
   */
@@ -32,35 +33,39 @@ class Transformation extends munit.FunSuite {
         |""".stripMargin
 
     val parser: SparqlParser = JenaSparqlParser
-    val qn = parser.parse(sparql)
-    val parsed = qn.where
-    assert(parsed != null)
+    val qn: ParsedQuery = parser.parse(sparql)
+    assert(!qn.isInstanceOf[ext.Unsupported])
+    qn.where match {
+      case Some(parsed) => {
+        assert(parsed != null)
 
-    // Make sure we only discovered one BGP
-    assert(!parsed.aborted, parsed.abortReason)
-    assert(!parsed.requiresFallback)
-    assertListSize(parsed.filters, 0)
-    assertListSize(parsed.unions, 0)
-    assertListSize(parsed.optionals, 0)
-    assertListSize(parsed.others, 0)
-    assertListSize(parsed.bgp, 1)
+        // Make sure we only discovered one BGP
+        assert(!parsed.requiresFallback)
+        assertListSize(parsed.filters, 0)
+        assertListSize(parsed.unions, 0)
+        assertListSize(parsed.optionals, 0)
+        assertListSize(parsed.others, 0)
+        assertListSize(parsed.bgp, 1)
 
-    val myBgp = parsed.bgp.head
-    val subject = myBgp.getMatchSubject
-    val predicate = myBgp.getMatchPredicate
-    val o = myBgp.getMatchObject
+        val myBgp = parsed.bgp.head
+        val subject = myBgp.getMatchSubject
+        val predicate = myBgp.getMatchPredicate
+        val o = myBgp.getMatchObject
 
-    println(myBgp)
-    printNode(subject)
-    printNode(predicate)
-    printNode(o)
+        println(myBgp)
+        printNode(subject)
+        printNode(predicate)
+        printNode(o)
 
-    assert(subject.isVariable)
-    assertEquals(subject.getName, "s", subject)
-    assert(predicate.isURI)
-    assertEquals(predicate.getURI, "http://xmlns.com/foaf/0.1/name", subject)
-    assert(o.isVariable)
-    assertEquals(o.getName, "name", subject)
+        assert(subject.isVariable)
+        assertEquals(subject.getName, "s", subject)
+        assert(predicate.isURI)
+        assertEquals(predicate.getURI, "http://xmlns.com/foaf/0.1/name", subject)
+        assert(o.isVariable)
+        assertEquals(o.getName, "name", subject)
+      }
+      case None => fail("There should be something")
+    }
   }
 
   def printNode(node: ext.Node): Unit = {
@@ -117,17 +122,22 @@ class Transformation extends munit.FunSuite {
 
     val parser: SparqlParser = JenaSparqlParser
     val qn = parser.parse(sparql)
-    val parsed = qn.where
-    assert(parsed != null)
+    assert(!qn.isInstanceOf[ext.Unsupported])
 
-    // Make sure we only discovered one BGP
-    assert(!parsed.aborted, parsed.abortReason)
-    assert(!parsed.requiresFallback)
-    assertListSize(parsed.filters, 0)
-    assertListSize(parsed.unions, 0)
-    assertListSize(parsed.optionals, 0)
-    assertListSize(parsed.others, 0)
-    assertListSize(parsed.bgp, 2)
+    qn.where match {
+      case Some(parsed) => {
+        assert(parsed != null)
+
+        // Make sure we only discovered one BGP
+        assert(!parsed.requiresFallback)
+        assertListSize(parsed.filters, 0)
+        assertListSize(parsed.unions, 0)
+        assertListSize(parsed.optionals, 0)
+        assertListSize(parsed.others, 0)
+        assertListSize(parsed.bgp, 2)
+      }
+      case None => fail("There should be some")
+    }
   }
 
   def assertListSize[T](lst: Seq[T], expectedLength: Int): Unit = {
@@ -195,15 +205,37 @@ class Transformation extends munit.FunSuite {
     val parser: SparqlParser = JenaSparqlParser
     val qn = parser.parse(sparql)
 
-    val result = buildMotifAndFilter(qn.where.bgp)
+    qn.where match {
+      case Some(where) => {
+        val result = buildMotifAndFilter(where.bgp)
 
-    assertEquals(result.motif, "(v1)-[e0]->(v2)")
-    assertEquals(
-      result.filter,
-      "e0.relationship = 'http://xmlns.com/foaf/0.1/name'"
-    )
+        assertEquals(result.motif, "(v1)-[e0]->(v2)")
+        assertEquals(
+          result.filter,
+          "e0.relationship = 'http://xmlns.com/foaf/0.1/name'"
+        )
+      }
+      case None => fail("There should be some")
+    }
+  }
 
-    assertEquals(qn.select.vars, List("s", "name"))
-    assertEquals(qn.select.uris, List())
+  test("Extract vars and URIs from select") {
+    val sparql =
+      """
+        |SELECT ?s ?name WHERE {
+        |  ?s <http://xmlns.com/foaf/0.1/name> ?name .
+        |}
+        |""".stripMargin
+
+    val parser: SparqlParser = JenaSparqlParser
+    val qn = parser.parse(sparql)
+
+    qn.select match {
+      case Some(select) => {
+        assertEquals(select.vars, List("s", "name"))
+        assertEquals(select.uris, List())
+      }
+      case None => fail("There should be some")
+    }
   }
 }

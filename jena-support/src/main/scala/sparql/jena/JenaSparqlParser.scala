@@ -2,7 +2,6 @@ package sparql.jena
 
 import sparql.core.ext.ParsedQuery
 import sparql.core.ext.SparqlParser
-import sparql.core.query.Executor
 
 object JenaSparqlParser extends SparqlParser {
 
@@ -18,9 +17,7 @@ object JenaSparqlParser extends SparqlParser {
         throw UnsupportedQuery("Only SELECT statements are supported for now")
     }
   }
-  */
   def parse[T](query: String): Executor[T] ={
-    /*
     val q = QueryFactory.create(query)
     val r: Executor[DataFrame] = parseSelect(q)
 
@@ -28,9 +25,9 @@ object JenaSparqlParser extends SparqlParser {
       case e: Executor[T] => e
       case _ => throw new IllegalArgumentException()
     }
-    */
     ???
   } 
+    */
 
   /*
   private def parseSelect(q: Query): SelectNode = {
