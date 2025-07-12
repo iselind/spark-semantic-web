@@ -14,7 +14,9 @@ trait SparqlQueryExecutor {
 }
 
 object SparkSessionSparqlExtension {
-  implicit class SparqlEnhancedSession(spark: SparkSession)(implicit sparqlContext: SparQLContext) {
+  implicit class SparqlEnhancedSession(spark: SparkSession)(implicit
+      sparqlContext: SparQLContext
+  ) {
     def sparql(query: String): SparqlResult = {
       sparqlContext.execStrategy.execute(query)(spark, sparqlContext)
     }
@@ -24,7 +26,10 @@ object SparkSessionSparqlExtension {
     }
   }
 
-  implicit class SparqlEnhancedGraph(g: GraphFrame)(implicit spark: SparkSession,sparqlContext: SparQLContext) {
+  implicit class SparqlEnhancedGraph(g: GraphFrame)(implicit
+      spark: SparkSession,
+      sparqlContext: SparQLContext
+  ) {
     def sparql(query: String): SparqlResult = {
       sparqlContext.execStrategy.execute(query)(spark, sparqlContext)
     }

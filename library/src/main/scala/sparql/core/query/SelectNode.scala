@@ -5,8 +5,11 @@ import org.graphframes.GraphFrame
 import sparql.core.GraphResolver
 import sparql.core.ext.Node
 
-case class SelectNode(vars: List[String], uris: List[Node], where: WhereNode) extends Executor[DataFrame] {
-  override def run(aliasMap: Map[String, String], graphResolver: GraphResolver)(frame: Option[GraphFrame]): DataFrame = {
+case class SelectNode(vars: List[String], uris: List[Node], where: WhereNode)
+    extends Executor[DataFrame] {
+  override def run(aliasMap: Map[String, String], graphResolver: GraphResolver)(
+      frame: Option[GraphFrame]
+  ): DataFrame = {
     /*
     val f = where.run(aliasMap = aliasMap, graphResolver = graphResolver)(frame)
 
@@ -19,7 +22,7 @@ case class SelectNode(vars: List[String], uris: List[Node], where: WhereNode) ex
     f.vertices.select(realKeyMap: _*)
 
     // I have no clue what to do with the parameter "uris"
-    */
+     */
     ???
   }
 }

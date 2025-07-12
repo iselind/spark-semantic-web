@@ -12,8 +12,9 @@ sealed trait ParsedQuery { self =>
   def exec()(implicit spark: SparkSession): Out
 
   var select: Option[SelectNode] = Option.empty
-  var bgp:Option[BasicGraphPatternNode] = Option.empty
-  var where:Option[WhereNode] = Option.empty
+  var bgp: Option[BasicGraphPatternNode] = Option.empty
+
+  def where: Option[WhereNode] = select.map(a => a.where)
 }
 
 final case class Select() extends ParsedQuery {

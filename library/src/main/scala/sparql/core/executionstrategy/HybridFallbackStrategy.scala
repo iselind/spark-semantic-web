@@ -22,7 +22,10 @@ class HybridFallbackStrategy(
 
   override def execute(
       query: String
-  )(implicit spark: SparkSession, sparqlContext: SparQLContext): SparqlResult = {
+  )(implicit
+      spark: SparkSession,
+      sparqlContext: SparQLContext
+  ): SparqlResult = {
     /*
     val qn = parser.parse(query)
     val ast = qn.where
@@ -31,7 +34,7 @@ class HybridFallbackStrategy(
     } else {
       sparqlParser.execute(qn)
     }
-    */
+     */
     ???
   }
 }

@@ -21,7 +21,10 @@ object JenaOnlyStrategy extends SparqlExecutionStrategy {
     */
   def execute(
       query: String
-  )(implicit spark: SparkSession, sparqlContext: SparQLContext): SparqlResult = {
+  )(implicit
+      spark: SparkSession,
+      sparqlContext: SparQLContext
+  ): SparqlResult = {
     val graphStore = sparqlContext.graphStore
     if (graphStore.listGraphs().size != 1)
       throw IncompatibleGraphStore("Unexpected number of named graphs")
@@ -29,7 +32,7 @@ object JenaOnlyStrategy extends SparqlExecutionStrategy {
     val graph = graphStore.getGraph("Jena")
     graph match {
       case Some(graph) =>
-        SparqlDataFrame( FallbackHandler.fallback(query, graph))
+        SparqlDataFrame(FallbackHandler.fallback(query, graph))
       case None =>
         throw NoSuchGraph("Jena")
     }

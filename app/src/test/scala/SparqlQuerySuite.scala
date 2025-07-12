@@ -43,7 +43,7 @@ class SparqlQuerySuite extends FunSuite {
 
     val actualNames: List[String] = sparkSession
       .sparql(query)
-      .asDataframe  // TODO: Shouldn't be needed because of implicits in the SparqlResult subclasses
+      .asDataframe // TODO: Shouldn't be needed because of implicits in the SparqlResult subclasses
       .select("name")
       .as[String]
       .collect()

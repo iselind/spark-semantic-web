@@ -53,7 +53,7 @@ class BasicGraphResolver(store: GraphStore) extends GraphResolver {
       schema match {
         case "spark" => store.getGraph(graphName)
         case "local" => store.getGraph(graphName)
-        case _ => ???
+        case _       => ???
       }
     }
 

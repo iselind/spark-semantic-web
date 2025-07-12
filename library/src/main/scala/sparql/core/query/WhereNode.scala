@@ -10,4 +10,5 @@ case class WhereNode(
     unions: List[List[WhereNode]] = List(),
     optionals: List[WhereNode] = List(),
     others: List[String] = List(),
-    requiresFallback: Boolean = false) { }
+    requiresFallback: Boolean = false
+) {}

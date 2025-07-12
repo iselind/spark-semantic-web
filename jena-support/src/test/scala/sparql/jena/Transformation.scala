@@ -1,9 +1,11 @@
 package sparql.jena
 
 import sparql.core.ext
-import sparql.core.ext.SparqlParser
 import sparql.core.ext.ParsedQuery
+import sparql.core.ext.SparqlParser
 import sparql.core.query.BgpToGraphFrame.buildMotifAndFilter
+import sparql.core.query.SelectNode
+import sparql.core.query.WhereNode
 
 /** Tests the conversion from sparql to QueryNode
   */
@@ -35,8 +37,16 @@ class Transformation extends munit.FunSuite {
     val parser: SparqlParser = JenaSparqlParser
     val qn: ParsedQuery = parser.parse(sparql)
     assert(!qn.isInstanceOf[ext.Unsupported])
-    qn.where match {
-      case Some(parsed) => {
+
+    assertSome(
+      qn.select,
+      (s: SelectNode) => {
+        assert(s.where != null)
+      }
+    )
+    assertSome(
+      qn.where,
+      (parsed: WhereNode) => {
         assert(parsed != null)
 
         // Make sure we only discovered one BGP
@@ -60,12 +70,15 @@ class Transformation extends munit.FunSuite {
         assert(subject.isVariable)
         assertEquals(subject.getName, "s", subject)
         assert(predicate.isURI)
-        assertEquals(predicate.getURI, "http://xmlns.com/foaf/0.1/name", subject)
+        assertEquals(
+          predicate.getURI,
+          "http://xmlns.com/foaf/0.1/name",
+          subject
+        )
         assert(o.isVariable)
         assertEquals(o.getName, "name", subject)
       }
-      case None => fail("There should be something")
-    }
+    )
   }
 
   def printNode(node: ext.Node): Unit = {
@@ -124,8 +137,9 @@ class Transformation extends munit.FunSuite {
     val qn = parser.parse(sparql)
     assert(!qn.isInstanceOf[ext.Unsupported])
 
-    qn.where match {
-      case Some(parsed) => {
+    assertSome(
+      qn.where,
+      (parsed: WhereNode) => {
         assert(parsed != null)
 
         // Make sure we only discovered one BGP
@@ -136,8 +150,7 @@ class Transformation extends munit.FunSuite {
         assertListSize(parsed.others, 0)
         assertListSize(parsed.bgp, 2)
       }
-      case None => fail("There should be some")
-    }
+    )
   }
 
   def assertListSize[T](lst: Seq[T], expectedLength: Int): Unit = {
@@ -205,8 +218,9 @@ class Transformation extends munit.FunSuite {
     val parser: SparqlParser = JenaSparqlParser
     val qn = parser.parse(sparql)
 
-    qn.where match {
-      case Some(where) => {
+    assertSome(
+      qn.where,
+      (where: WhereNode) => {
         val result = buildMotifAndFilter(where.bgp)
 
         assertEquals(result.motif, "(v1)-[e0]->(v2)")
@@ -215,8 +229,7 @@ class Transformation extends munit.FunSuite {
           "e0.relationship = 'http://xmlns.com/foaf/0.1/name'"
         )
       }
-      case None => fail("There should be some")
-    }
+    )
   }
 
   test("Extract vars and URIs from select") {
@@ -230,12 +243,19 @@ class Transformation extends munit.FunSuite {
     val parser: SparqlParser = JenaSparqlParser
     val qn = parser.parse(sparql)
 
-    qn.select match {
-      case Some(select) => {
+    assertSome(
+      qn.select,
+      (select: SelectNode) => {
         assertEquals(select.vars, List("s", "name"))
         assertEquals(select.uris, List())
       }
-      case None => fail("There should be some")
+    )
+  }
+
+  def assertSome[T](o: Option[T], check: T => Unit) = {
+    o match {
+      case Some(value) => check(value)
+      case None        => fail("There should be some")
     }
   }
 }
