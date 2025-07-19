@@ -2,16 +2,13 @@ package sparql.jena
 
 import munit.FunSuite
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.CatalystTypeConverters
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.encoders.AgnosticEncoders
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
-import org.apache.spark.sql.types._
+import sparql.core.SCompiler
 import sparql.jena.JenaFrontEnd
 
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -46,7 +43,15 @@ class SparqlSparkSuite extends FunSuite {
         |}
       """.stripMargin
 
-    val logicalPlan = time("compile", JenaFrontEnd.compile(sparqlQuery, "quads")(spark))
+    val sb = time("compile", JenaFrontEnd.compile(sparqlQuery))
+    val rawPlan = SCompiler.compile(sb.result())
+
+    val logicalPlan = rawPlan transformUp {
+      case _: org.apache.spark.sql.catalyst.plans.logical.LocalRelation =>
+        val startDF = spark.table("quads")
+        startDF.queryExecution.logical
+    }
+
     assert(logicalPlan != null)
     assert(
       logicalPlan

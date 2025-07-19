@@ -15,7 +15,6 @@ object SparkSessionFixture extends Fixture[SparkSession]("spark") {
       .getOrCreate()
 
     // warm-up
-    import s.implicits._
     s.range(1).count()
     println("[spark warmup] done")
     s

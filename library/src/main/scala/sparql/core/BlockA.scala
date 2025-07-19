@@ -3,9 +3,6 @@ package sparql.core
 // -----------------------------------------------------------------------------
 // BLOCK A  -  algebra   +   builder   +   Spark compiler
 // -----------------------------------------------------------------------------
-import org.apache.spark.sql.Column
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.expressions.Alias
 import org.apache.spark.sql.catalyst.expressions.Attribute
 import org.apache.spark.sql.catalyst.expressions.EqualTo
@@ -14,17 +11,18 @@ import org.apache.spark.sql.catalyst.expressions.Literal
 import org.apache.spark.sql.catalyst.expressions.SortOrder
 import org.apache.spark.sql.catalyst.expressions.aggregate.Count
 import org.apache.spark.sql.catalyst.plans.Inner
-import org.apache.spark.sql.catalyst.plans.JoinType
 import org.apache.spark.sql.catalyst.plans.LeftOuter
 import org.apache.spark.sql.catalyst.plans.logical.Aggregate
 import org.apache.spark.sql.catalyst.plans.logical.Distinct
 import org.apache.spark.sql.catalyst.plans.logical.JoinHint
 import org.apache.spark.sql.catalyst.plans.logical.Limit
+import org.apache.spark.sql.catalyst.plans.logical.LocalRelation
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.catalyst.plans.logical.Project
 import org.apache.spark.sql.catalyst.plans.logical.Sort
-import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.functions.lit
+import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.types.StructField
+import org.apache.spark.sql.types.StructType
 
 // -- 1 · Algebra --------------------------------------------------------------
 sealed trait SOp
@@ -112,12 +110,10 @@ class StackSBuilder extends SBuilder {
 
 // -- 6 · Compiler  (SOp → LogicalPlan) ---------------------------------------
 object SCompiler {
-  def compile(qp: QueryPlan, startPlan: LogicalPlan)(implicit
-      spark: SparkSession
-  ): LogicalPlan = {
-    def compileWhere(op: SOp)(implicit spark: SparkSession): LogicalPlan =
+  def compile(qp: QueryPlan): LogicalPlan = {
+    def compileWhere(op: SOp): LogicalPlan =
       op match {
-        case Bgp(ts) => joinFromTriples(ts, startPlan)
+        case Bgp(ts) => joinFromTriples(ts)
         case Filter(e, c) => {
           val child = compileWhere(c)
           org.apache.spark.sql.catalyst.plans.logical
@@ -178,12 +174,23 @@ object SCompiler {
   }
 
   private def joinFromTriples(
-      ts: Seq[TriplePattern],
-      plan: LogicalPlan
-  )(implicit spark: SparkSession): LogicalPlan = {
+      ts: Seq[TriplePattern]
+  ): LogicalPlan = {
     // helper to build AttributeReference for given column name once
-    def attr(name: String) = getAttribute(plan, name)
-    var newPlan = plan
+    val schema = StructType(
+      Seq(
+        StructField("s", StringType, nullable = true),
+        StructField("p", StringType, nullable = true),
+        StructField("o", StringType, nullable = true),
+        StructField("g", StringType, nullable = true)
+      )
+    )
+
+    // Create a dummy logical relation to be replaced when we know the real source of data
+    LocalRelation(schema)
+    val lr = LocalRelation()
+    def attr(name: String) = getAttribute(lr, name)
+    var newPlan: LogicalPlan = lr
     ts.foreach { t =>
       Seq(
         t.s.left.toOption.map("s" -> _),
@@ -197,11 +204,7 @@ object SCompiler {
     newPlan
   }
 
-  private def exprToCol(e: SExpr): Column = e match {
-    case VarExpr(n)      => col(n)
-    case ConstExpr(v)    => lit(v)
-    case NotEquals(a, b) => exprToCol(a) =!= exprToCol(b)
-  }
+  
 
   private def exprToExpression(
       e: SExpr,

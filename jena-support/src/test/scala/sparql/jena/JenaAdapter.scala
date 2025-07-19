@@ -4,16 +4,9 @@ package sparql.jena
 //  B)  Apache Jena adapter to produce that algebra.
 // -----------------------------------------------------------------------------
 // **These file compiles with Spark 4.0.0 + Scala 2.13.14**
-
-import org.apache.jena.query.Query
-import org.apache.jena.query.QueryFactory
-import org.apache.jena.sparql.algebra.Algebra
 import org.apache.jena.sparql.algebra.OpVisitorBase
 import org.apache.jena.sparql.algebra.op._
 import org.apache.jena.sparql.expr._
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import sparql.core.ConstExpr
 import sparql.core.NotEquals
 import sparql.core.SBuilder

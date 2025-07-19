@@ -63,6 +63,12 @@ inThisBuild(
   List(
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
-    scalaVersion := scalaVer
+    scalaVersion := scalaVer,
+    scalacOptions ++= List(
+      "-Yrangepos", // required for scalafix semantic rules
+      "-Wunused:imports",  // warns about unused imports
+      "-Wunused:privates", // optional, for unused private vals/methods
+      "-Wunused:locals"    // optional, for unused local variables
+    )
   )
 )
