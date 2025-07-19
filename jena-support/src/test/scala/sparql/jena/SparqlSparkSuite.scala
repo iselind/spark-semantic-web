@@ -1,15 +1,7 @@
 package sparql.jena
 
 import munit.FunSuite
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.Row
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.CatalystTypeConverters
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
-import sparql.core.SCompiler
-import sparql.jena.JenaFrontEnd
 
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.atomic.LongAdder
@@ -43,24 +35,10 @@ class SparqlSparkSuite extends FunSuite {
         |}
       """.stripMargin
 
-    val sb = time("compile", JenaFrontEnd.compile(sparqlQuery))
-    val rawPlan = SCompiler.compile(sb.result())
 
-    val logicalPlan = rawPlan transformUp {
-      case _: org.apache.spark.sql.catalyst.plans.logical.LocalRelation =>
-        val startDF = spark.table("quads")
-        startDF.queryExecution.logical
-    }
+    val q = JenaFrontEnd.compile(sparqlQuery)
+    val df = q(spark.table("quads"))
 
-    assert(logicalPlan != null)
-    assert(
-      logicalPlan
-        .isInstanceOf[
-          org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
-        ]
-    )
-
-    val df = time("to DF", logicalPlanToDataFrame(logicalPlan))
     val count = time("df collection", df.count())
 
     assertEquals(count, 2L)
@@ -87,21 +65,4 @@ class SparqlSparkSuite extends FunSuite {
     result
   }
 
-  def logicalPlanToDataFrame(
-      plan: LogicalPlan
-  ): DataFrame = {
-    // 1. Let Spark turn the logical plan into a physical RDD of InternalRow
-    val qe = spark.sessionState.executePlan(plan) // QueryExecution
-    val rdd = qe.toRdd // RDD[InternalRow]
-
-    // 2. Convert InternalRow → Row and build a DataFrame with the same schema
-    val schema = qe.analyzed.schema
-    val toScala = CatalystTypeConverters
-      .createToScalaConverter(schema)
-      .asInstanceOf[InternalRow => Row]
-    val rowRDD = rdd.mapPartitions(_.map(toScala))
-    // Create explicit encoder to avoid having Spark do reflection and schema analysis
-    val encoder = Encoders.row(schema)
-    spark.createDataset(rowRDD)(encoder)
-  }
 }

@@ -10,7 +10,7 @@ import sparql.core.StackSBuilder
 import scala.jdk.CollectionConverters._
 
 object JenaFrontEnd {
-  def compile(q: String): StackSBuilder = {
+  def compile(q: String): SparqlQuery = {
     val query = QueryFactory.create(q)
     val algebra = Algebra.compile(query)
     val sb = new StackSBuilder
@@ -29,6 +29,6 @@ object JenaFrontEnd {
     }
 
     algebra.visit(new JenaAdapter(sb))
-    sb
+    SparqlQuery(sb.result())
   }
 }
