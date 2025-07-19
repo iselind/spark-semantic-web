@@ -1,17 +1,13 @@
 import sbt.Keys.resolvers
 
-val scalaVer = "2.12.20"
-val sparkVersion = "3.5.1"
+val scalaVer = "2.13.16"
+val sparkVersion = "4.0.0"
 
 lazy val commonSettings = Seq(
   scalaVersion := scalaVer,
   organization := "com.example",
   libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
-  version := "0.1.0-SNAPSHOT",
-  Compile / scalacOptions ++= Seq(
-    "-Ywarn-unused",
-    "-Ywarn-unused-import"
-  )
+  version := "0.1.0-SNAPSHOT"
 )
 
 lazy val formatOnCompileSettings = Seq(
@@ -37,10 +33,7 @@ lazy val library = (project in file("library"))
     formatOnCompileSettings,
     name := "sparkql",
     libraryDependencies ++= Seq(
-      "org.apache.spark" %% "spark-core" % sparkVersion,
       "org.apache.spark" %% "spark-sql" % sparkVersion,
-      "org.apache.spark" %% "spark-graphx" % sparkVersion,
-      "graphframes" % "graphframes" % "0.8.4-spark3.5-s_2.12"
     ),
     resolvers += "Spark Packages Repo" at "https://repos.spark-packages.org/"
   )
