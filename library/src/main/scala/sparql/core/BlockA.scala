@@ -1,10 +1,8 @@
-package sparql.jena
+package sparql.core
 
 // -----------------------------------------------------------------------------
 // BLOCK A  -  algebra   +   builder   +   Spark compiler
 // -----------------------------------------------------------------------------
-import org.apache.jena.sparql.expr.Expr
-import org.apache.jena.sparql.expr.ExprFunction2
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.SparkSession

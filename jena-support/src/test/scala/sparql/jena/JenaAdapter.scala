@@ -14,6 +14,11 @@ import org.apache.jena.sparql.expr._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
+import sparql.core.ConstExpr
+import sparql.core.NotEquals
+import sparql.core.SBuilder
+import sparql.core.TriplePattern
+import sparql.core.VarExpr
 
 import scala.jdk.CollectionConverters._
 
@@ -60,66 +65,4 @@ class JenaAdapter(b: SBuilder) extends OpVisitorBase {
   }
 }
 
-// Type-class: "This can be regarded as a LogicalPlan"
-trait AsLogicalPlan[A] {
-  def toLP(value: A)(implicit spark: SparkSession): LogicalPlan
-}
 
-object AsLogicalPlan {
-  implicit val lpIsLp: AsLogicalPlan[LogicalPlan] =
-    new AsLogicalPlan[LogicalPlan] {
-      def toLP(lp: LogicalPlan)(implicit spark: SparkSession): LogicalPlan = lp
-    }
-
-  implicit val dfIsLp: AsLogicalPlan[DataFrame] = new AsLogicalPlan[DataFrame] {
-    def toLP(df: DataFrame)(implicit spark: SparkSession): LogicalPlan =
-      df.queryExecution.analyzed
-  }
-
-  implicit val strIsLp: AsLogicalPlan[String] = new AsLogicalPlan[String] {
-    def toLP(table: String)(implicit spark: SparkSession): LogicalPlan =
-      dfIsLp.toLP(spark.table(table))
-  }
-}
-
-object JenaFrontEnd {
-  def compile[A: AsLogicalPlan](q: String, input: A)(implicit
-      spark: SparkSession
-  ): LogicalPlan = {
-    val lp = implicitly[AsLogicalPlan[A]].toLP(input)
-    compile(q, lp)
-  }
-  def compile(q: String, tableName: String)(implicit
-      spark: SparkSession
-  ): LogicalPlan = {
-    compile(q, spark.table(tableName))
-  }
-  def compile(q: String, df: DataFrame)(implicit
-      spark: SparkSession
-  ): LogicalPlan = {
-    compile(q, df.queryExecution.analyzed) // or `.logical`?
-  }
-  def compile(q: String, lp: LogicalPlan)(implicit
-      spark: SparkSession
-  ): LogicalPlan = {
-    val query = QueryFactory.create(q)
-    val algebra = Algebra.compile(query)
-    val sb = new StackSBuilder
-
-    query.getQueryType match {
-      case Query.QueryTypeSelect =>
-        sb.setResultForm(
-          Select(
-            query.getProjectVars.asScala.map(_.getVarName).toSeq,
-            query.isDistinct
-          )
-        )
-      case Query.QueryTypeAsk => sb.setResultForm(Ask)
-      case _ =>
-        throw new UnsupportedOperationException("only SELECT/ASK in skeleton")
-    }
-
-    algebra.visit(new JenaAdapter(sb))
-    SCompiler.compile(sb.result(), lp)
-  }
-}
