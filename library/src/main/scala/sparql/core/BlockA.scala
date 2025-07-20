@@ -20,6 +20,7 @@ case class ProjectVars(vars: Seq[String], child: SOp) extends SOp
 sealed trait SExpr
 case class VarExpr(name: String) extends SExpr
 case class ConstExpr(value: String) extends SExpr
+case class Equals(a: SExpr, b: SExpr) extends SExpr
 case class NotEquals(a: SExpr, b: SExpr) extends SExpr
 
 case class TriplePattern(
@@ -49,7 +50,7 @@ trait SBuilder {
   def startOptional(): Unit; def endOptional(): Unit
   def startUnion(): Unit; def endUnion(): Unit
   def startGraph(target: Either[String, String]): Unit; def endGraph(): Unit
-  def setProject(vars: Seq[String]): Unit
+  def setProject(vars: Seq[String]): Unit // Not sure when this would be used, i.e. which Sparql construct this would map to. There might be a better name for this if we decide to keep it
   def setResultForm(form: ResultForm): Unit
   def result(): QueryPlan
 }

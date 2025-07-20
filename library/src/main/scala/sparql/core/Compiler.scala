@@ -110,6 +110,12 @@ object SCompiler {
   ): org.apache.spark.sql.catalyst.expressions.Expression = e match {
     case VarExpr(n)   => UnresolvedAttribute(n)
     case ConstExpr(v) => Literal(v)
+    case Equals(a, b) =>
+      org.apache.spark.sql.catalyst.expressions
+        .EqualTo(
+          exprToExpression(a, plan),
+          exprToExpression(b, plan)
+        )
     case NotEquals(a, b) =>
       org.apache.spark.sql.catalyst.expressions.Not(
         org.apache.spark.sql.catalyst.expressions
@@ -118,6 +124,8 @@ object SCompiler {
             exprToExpression(b, plan)
           )
       )
+    // TODO: There are other operators as well, like <, >, and so on.
+    // They are used for example to filter on numbers like age
   }
 
   private def compileSelect(base: LogicalPlan, s: Select): LogicalPlan = {
@@ -130,7 +138,7 @@ object SCompiler {
         val a =
           UnresolvedAttribute(
             v
-          ) // Might be that lp here should be base, not sure
+          )
         SortOrder(
           a,
           if (asc) org.apache.spark.sql.catalyst.expressions.Ascending
